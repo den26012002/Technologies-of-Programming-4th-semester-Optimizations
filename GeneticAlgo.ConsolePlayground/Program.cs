@@ -52,25 +52,25 @@ static void Print(GeneticAlgo.Core.ExecutionContext executionContext, bool needF
 }
 
 
-/*GeneticAlgo.Core.ExecutionContext executionContext = new GeneticAlgo.Core.ExecutionContext(
+GeneticAlgo.Core.ExecutionContext executionContext = new GeneticAlgo.Core.ExecutionContext(
     new Random(),
     new FitnessFunctionCalculatorBuilder(),
     new SelectionOperatorBuilder(),
     new FirstTypeMutationOperatorBuilder(),
     new SecondTypeMutationOperatorBuilder(),
     new MergeOperatorBuilder());
-Print(executionContext);
+//Print(executionContext);
 
 for (int i = 0; i < 100; i++)
 {
     executionContext.ExecuteIterationAsync();
     Print(executionContext, false);
-    Console.Write($" {i}");
+    //Console.Write($" {i}");
 }
 
-Print(executionContext);*/
+//Print(executionContext);
 
-var executionContext = new GeneticAlgo.Core.ExecutionContext(
+/*var executionContext = new GeneticAlgo.Core.ExecutionContext(
     new Random(),
     new FitnessFunctionCalculatorBuilder(),
     new SelectionOperatorBuilder(),
@@ -84,4 +84,4 @@ do
     iterationResult = await executionContext.ExecuteIterationAsync();
     Print(executionContext, false);
 }
-while (iterationResult == IterationResult.IterationFinished);
+while (iterationResult == IterationResult.IterationFinished);*/
