@@ -17,11 +17,11 @@ namespace GeneticAlgo.Core.GeneticOperators
         }
         public List<Genom> Apply(List<Genom> oldPopulation)
         {
-            List<double> prefixSums = new List<double>();
-            prefixSums.Add(oldPopulation[0].FitnessValue);
+            double[] prefixSums = new double[oldPopulation.Count];
+            prefixSums[0] = oldPopulation[0].FitnessValue;
             for (int i = 1; i < oldPopulation.Count; ++i)
             {
-                prefixSums.Add(prefixSums[i - 1] + oldPopulation[i].FitnessValue);
+                prefixSums[i] = prefixSums[i - 1] + oldPopulation[i].FitnessValue;
             }
 
             List<Genom> newPopulation = new List<Genom>();
@@ -34,7 +34,7 @@ namespace GeneticAlgo.Core.GeneticOperators
             for (int i = newPopulation.Count; i < oldPopulation.Count; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(prefixSums.Last());
-                int spinnedGenom = Array.FindIndex(prefixSums.ToArray(), x => x > spinResult);
+                int spinnedGenom = Array.FindIndex(prefixSums, x => x > spinResult);
                 // int spinResult = (int)prefixSums.ToArray().GetLowerBound(_randomizer.NextSpinResult(prefixSums.Last()));
                 var genomClone = oldPopulation[spinnedGenom].Clone();
                 newPopulation.Add(genomClone);
