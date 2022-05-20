@@ -22,8 +22,8 @@ namespace GeneticAlgo.Core
         private readonly IMutationOperator _firstTypeMutationOperator;
         private readonly IMutationOperator _secondTypeMutationOperator;
         private readonly IMergeOperator _mergeOperator;
-        public List<Genom> _population;
-        private List<Point> _populationPoints;
+        public Genom[] _population;
+        private Point[] _populationPoints;
 
         public ExecutionContext(
             Random random,
@@ -50,29 +50,29 @@ namespace GeneticAlgo.Core
             _secondTypeMutationOperator = secondTypeMutationOperatorBuilder.GetResult();
             _mergeOperator = mergeOperatorBuilder.GetResult();
 
-            _population = new List<Genom>();
-            _populationPoints = new List<Point>();
+            _population = new Genom[_config.UnitCount];
+            _populationPoints = new Point[_config.UnitCount];
             for (int i = 0; i < _config.UnitCount; ++i)
             {
                 var genom = new Genom();
                 genom.Chromosome.Add(new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart()));
                 Point resultPoint = new Point();
                 genom.FitnessValue = _fitnessFunctionCalculator.Calculate(genom, out resultPoint);
-                _populationPoints.Add(resultPoint);
-                _population.Add(genom);
+                _populationPoints[i] = resultPoint;
+                _population[i] = genom;
             }
         }
 
         public Task<IterationResult> ExecuteIterationAsync()
         {
-            bool[] wasMutation = new bool[_population.Count];
+            bool[] wasMutation = new bool[_population.Length];
             var newPopulation = _selectionOperator.Apply(_population);
-            for (int i = 0; i < newPopulation.Count / 3; ++i)
+            for (int i = 0; i < newPopulation.Length / 3; ++i)
             {
                 wasMutation[i] = true;
             }
 
-            for (int i = 0; i < newPopulation.Count; ++i)
+            for (int i = 0; i < newPopulation.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(1);
                 if (spinResult <= _config.FirstTypeMutationProbability && !wasMutation[i])
@@ -85,7 +85,7 @@ namespace GeneticAlgo.Core
                 }
             }
 
-            for (int i = 0; i < newPopulation.Count; ++i)
+            for (int i = 0; i < newPopulation.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(1);
                 if (spinResult <= _config.SecondTypeMutationProbability && !wasMutation[i])
@@ -97,7 +97,7 @@ namespace GeneticAlgo.Core
             }
 
             List<int> mergeUnitsPositions = new List<int>();
-            for (int i = 0; i < newPopulation.Count; ++i)
+            for (int i = 0; i < newPopulation.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(1);
                 if (spinResult <= _config.MergeProbability && !wasMutation[i])
@@ -114,12 +114,12 @@ namespace GeneticAlgo.Core
                 (newPopulation[first], newPopulation[second]) = _mergeOperator.Apply(newPopulation[first], newPopulation[second]);
             }
 
-            _populationPoints = new List<Point>();
-            for (int i = 0; i < newPopulation.Count; ++i)
+            _populationPoints = new Point[_config.UnitCount];
+            for (int i = 0; i < newPopulation.Length; ++i)
             {
                 Point resultPoint = new Point();
                 newPopulation[i].FitnessValue = _fitnessFunctionCalculator.Calculate(newPopulation[i], out resultPoint);
-                _populationPoints.Add(resultPoint);
+                _populationPoints[i] = resultPoint;
             }
 
             _population = newPopulation;

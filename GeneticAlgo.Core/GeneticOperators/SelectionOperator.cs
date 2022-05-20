@@ -15,35 +15,35 @@ namespace GeneticAlgo.Core.GeneticOperators
         {
             _randomizer = randomizer;
         }
-        public List<Genom> Apply(List<Genom> oldPopulation)
+        public Genom[] Apply(Genom[] oldPopulation)
         {
-            double[] prefixSums = new double[oldPopulation.Count];
+            double[] prefixSums = new double[oldPopulation.Length];
             prefixSums[0] = oldPopulation[0].FitnessValue;
-            for (int i = 1; i < oldPopulation.Count; ++i)
+            for (int i = 1; i < oldPopulation.Length; ++i)
             {
                 prefixSums[i] = prefixSums[i - 1] + oldPopulation[i].FitnessValue;
             }
 
-            List<Genom> newPopulation = new List<Genom>();
+            Genom[] newPopulation = new Genom[oldPopulation.Length];
 
-            for (int i = 0; i < oldPopulation.Count / 2; ++i)
+            for (int i = 0; i < oldPopulation.Length / 2; ++i)
             {
-                newPopulation.Add(GetGenomWithMaxFitnessValue(oldPopulation).Clone());
+                newPopulation[i] = GetGenomWithMaxFitnessValue(oldPopulation).Clone();
             }
 
-            for (int i = newPopulation.Count; i < oldPopulation.Count; ++i)
+            for (int i = oldPopulation.Length / 2; i < oldPopulation.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(prefixSums.Last());
                 int spinnedGenom = Array.FindIndex(prefixSums, x => x > spinResult);
                 // int spinResult = (int)prefixSums.ToArray().GetLowerBound(_randomizer.NextSpinResult(prefixSums.Last()));
                 var genomClone = oldPopulation[spinnedGenom].Clone();
-                newPopulation.Add(genomClone);
+                newPopulation[i] = genomClone;
             }
 
             return newPopulation;
         }
 
-        private Genom GetGenomWithMaxFitnessValue(List<Genom> population)
+        private Genom GetGenomWithMaxFitnessValue(Genom[] population)
         {
             Genom ans = population.First();
             foreach (var genom in population)
