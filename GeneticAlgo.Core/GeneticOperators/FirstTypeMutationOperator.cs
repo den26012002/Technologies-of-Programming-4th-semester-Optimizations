@@ -18,9 +18,8 @@ namespace GeneticAlgo.Core.GeneticOperators
 
         public Genom Apply(Genom oldGenom)
         {
-            var newGenom = oldGenom.Clone();
-            newGenom.Chromosome.Add(new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart()));
-            return newGenom;
+            oldGenom.Chromosome.Add(new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart()));
+            return oldGenom;
         }
     }
 }
