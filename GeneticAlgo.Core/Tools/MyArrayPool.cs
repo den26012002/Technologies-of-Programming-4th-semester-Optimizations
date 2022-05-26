@@ -12,6 +12,7 @@ namespace GeneticAlgo.Core.Tools
         private Dictionary<int, List<bool>> _isUsed;
         private Dictionary<int, List<int>> _unusedTime;
         private Dictionary<int, Queue<int>> _freeIndexes;
+        private Dictionary<T[], int> _arrayIndexes;
         private int _maxUnusedTime;
 
 
@@ -20,7 +21,8 @@ namespace GeneticAlgo.Core.Tools
             _pools = new Dictionary<int, List<T[]>>();
             _isUsed = new Dictionary<int, List<bool>>();
             _unusedTime = new Dictionary<int, List<int>>();
-            _freeIndexes =  new Dictionary<int, Queue<int>>();
+            _freeIndexes = new Dictionary<int, Queue<int>>();
+            _arrayIndexes = new Dictionary<T[], int>();
             for (int i = 0; i < startCapacity.Length; ++i)
             {
                 int index = (int)Math.Pow(2, 4 + i);
@@ -41,6 +43,7 @@ namespace GeneticAlgo.Core.Tools
                 _pools[minimumLength].Add(new T[minimumLength]);
                 _isUsed[minimumLength].Add(true);
                 _unusedTime[minimumLength].Add(0);
+                _arrayIndexes[_pools[minimumLength][_pools[minimumLength].Count - 1]] = _pools[minimumLength].Count - 1;
                 // Update();
                 return _pools[minimumLength][_pools[minimumLength].Count - 1];
             }
@@ -56,25 +59,10 @@ namespace GeneticAlgo.Core.Tools
 
         public void Return(T[] array)
         {
-            List<T[]> pool = _pools[array.Length];
-            bool isInPool = false;
-            for (int i = 0; i < pool.Count; ++i)
-            {
-                if (pool[i] == array)
-                {
-                    _isUsed[array.Length][i] = false;
-                    _unusedTime[array.Length][i] = 0;
-                    _freeIndexes[array.Length].Enqueue(i);
-                    isInPool = true;
-                }
-            }
-
-            // Update();
-
-            if (!isInPool)
-            {
-                throw new Exception("Error: try to return the array that wasn't rented");
-            }
+            int index = _arrayIndexes[array];
+            _isUsed[array.Length][index] = false;
+            _unusedTime[array.Length][index] = 0;
+            _freeIndexes[array.Length].Enqueue(index);
         }
 
         private void Update()

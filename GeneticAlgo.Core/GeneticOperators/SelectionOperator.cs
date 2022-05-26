@@ -43,7 +43,6 @@ namespace GeneticAlgo.Core.GeneticOperators
             for (int i = oldPopulation.Length / 2; i < oldPopulation.Length; ++i)
             {
                 _spinResult = _randomizer.NextSpinResult(prefixSums.Last());
-                // int spinnedGenom = Array.FindIndex(prefixSums, x => x > spinResult);
                 int spinnedGenom = Array.FindIndex(prefixSums, _predicate);
                 newChromosomes[i] = oldPopulation[spinnedGenom].GetClonedChromosome();
                 newChromosomesLengths[i] = oldPopulation[spinnedGenom].ChromosomeLength;
@@ -55,8 +54,6 @@ namespace GeneticAlgo.Core.GeneticOperators
                 oldPopulation[i].Chromosome = newChromosomes[i];
                 oldPopulation[i].ChromosomeLength = newChromosomesLengths[i];
             }
-
-            // return oldPopulation;
         }
         private Genom GetGenomWithMaxFitnessValue(Genom[] population)
         {
