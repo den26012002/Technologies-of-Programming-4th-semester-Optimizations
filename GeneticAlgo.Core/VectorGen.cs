@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeneticAlgo.Core
 {
-    public class VectorGen : ICloneable<VectorGen>
+    public struct VectorGen : ICloneable<VectorGen>
     {
         public VectorGen(double x, double y)
         {
@@ -20,7 +20,8 @@ namespace GeneticAlgo.Core
 
         public VectorGen Clone()
         {
-            return new VectorGen(X, Y);
+            return this;
+            // return new VectorGen(X, Y);
         }
     }
 }
