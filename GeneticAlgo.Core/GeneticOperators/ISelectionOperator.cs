@@ -8,6 +8,6 @@ namespace GeneticAlgo.Core.GeneticOperators
 {
     public interface ISelectionOperator
     {
-        Genom[] Apply(Genom[] oldPopuation);
+        void Apply(Genom[] oldPopuation);
     }
 }

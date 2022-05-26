@@ -9,19 +9,37 @@ namespace GeneticAlgo.Core
 {
     public class Genom : ICloneable<Genom>
     {
-        public List<VectorGen> Chromosome { get; set; } = new List<VectorGen>();
+        public int ChromosomeLength { get; set; }
+        public VectorGen[] Chromosome { get; set; } = null;
         public double FitnessValue { get; set; }
+
+        public Genom(int chromosomeLength)
+        {
+            Chromosome = CountedArrayPoolDecorator<VectorGen>.Rent(chromosomeLength);
+            ChromosomeLength = chromosomeLength;
+        }
 
         public Genom Clone()
         {
-            Genom newGenom = new Genom();
-            foreach (var gen in Chromosome)
+            Genom newGenom = new Genom(ChromosomeLength);
+            for (int i = 0; i < ChromosomeLength; ++i)
             {
-                newGenom.Chromosome.Add(gen.Clone());
+                newGenom.Chromosome[i] = Chromosome[i].Clone();
             }
 
             newGenom.FitnessValue = FitnessValue;
             return newGenom;
+        }
+
+        public VectorGen[] GetClonedChromosome()
+        {
+            VectorGen[] newChromosome = CountedArrayPoolDecorator<VectorGen>.Rent(ChromosomeLength);
+            for (int i = 0; i < ChromosomeLength; ++i)
+            {
+                newChromosome[i] = Chromosome[i].Clone();
+            }
+
+            return newChromosome;
         }
     }
 }

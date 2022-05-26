@@ -8,6 +8,6 @@ namespace GeneticAlgo.Core.GeneticOperators
 {
     public interface IMutationOperator
     {
-        Genom Apply(Genom oldGenom);
+        void Apply(Genom oldGenom);
     }
 }

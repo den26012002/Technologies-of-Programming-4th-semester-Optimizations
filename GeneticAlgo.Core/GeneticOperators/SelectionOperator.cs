@@ -15,7 +15,7 @@ namespace GeneticAlgo.Core.GeneticOperators
         {
             _randomizer = randomizer;
         }
-        public Genom[] Apply(Genom[] oldPopulation)
+        public void Apply(Genom[] oldPopulation)
         {
             double[] prefixSums = new double[oldPopulation.Length];
             prefixSums[0] = oldPopulation[0].FitnessValue;
@@ -24,23 +24,33 @@ namespace GeneticAlgo.Core.GeneticOperators
                 prefixSums[i] = prefixSums[i - 1] + oldPopulation[i].FitnessValue;
             }
 
-            Genom[] newPopulation = new Genom[oldPopulation.Length];
+            // Genom[] newPopulation = new Genom[oldPopulation.Length];
+            VectorGen[][] newChromosomes = new VectorGen[oldPopulation.Length][];
+            int[] newChromosomesLengths = new int[oldPopulation.Length];
 
             for (int i = 0; i < oldPopulation.Length / 2; ++i)
             {
-                newPopulation[i] = GetGenomWithMaxFitnessValue(oldPopulation).Clone();
+                Genom genomWithMaxFitnessValue = GetGenomWithMaxFitnessValue(oldPopulation);
+                newChromosomes[i] = genomWithMaxFitnessValue.GetClonedChromosome();
+                newChromosomesLengths[i] = genomWithMaxFitnessValue.ChromosomeLength;
             }
 
             for (int i = oldPopulation.Length / 2; i < oldPopulation.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(prefixSums.Last());
                 int spinnedGenom = Array.FindIndex(prefixSums, x => x > spinResult);
-                // int spinResult = (int)prefixSums.ToArray().GetLowerBound(_randomizer.NextSpinResult(prefixSums.Last()));
-                var genomClone = oldPopulation[spinnedGenom].Clone();
-                newPopulation[i] = genomClone;
+                newChromosomes[i] = oldPopulation[spinnedGenom].GetClonedChromosome();
+                newChromosomesLengths[i] = oldPopulation[spinnedGenom].ChromosomeLength;
             }
 
-            return newPopulation;
+            for (int i = 0; i < oldPopulation.Length; ++i)
+            {
+                CountedArrayPoolDecorator<VectorGen>.Return(oldPopulation[i].Chromosome);
+                oldPopulation[i].Chromosome = newChromosomes[i];
+                oldPopulation[i].ChromosomeLength = newChromosomesLengths[i];
+            }
+
+            // return oldPopulation;
         }
 
         private Genom GetGenomWithMaxFitnessValue(Genom[] population)

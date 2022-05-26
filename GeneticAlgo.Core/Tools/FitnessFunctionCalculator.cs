@@ -20,9 +20,9 @@ namespace GeneticAlgo.Core.Tools
         {
             int barrierCirclesCount = 0;
             var position = new Point(0, 0);
-            foreach (var gen in genom.Chromosome)
+            for (int i = 0; i < genom.ChromosomeLength; ++i)
             {
-                position = new Point(position.X + gen.X, position.Y + gen.Y);
+                position = new Point(position.X + genom.Chromosome[i].X, position.Y + genom.Chromosome[i].Y);
                 foreach (var circle in _barrierCircles)
                 {
                     if (Distance(position, circle.Center) < circle.Radius)
@@ -33,7 +33,7 @@ namespace GeneticAlgo.Core.Tools
             }
 
             resultPoint = position;
-            return 1.0 / (0.4 * 20 * barrierCirclesCount + 0.5 * 1000 * Distance(position, new Point(1, 1)) + 0.1 * genom.Chromosome.Count);
+            return 1.0 / (0.4 * 20 * barrierCirclesCount + 0.5 * 1000 * Distance(position, new Point(1, 1)) + 0.1 * genom.ChromosomeLength);
             // return Math.Max(1.0 * _barrierCircles.Count - Distance(position, new Point(1, 1)) / Math.Sqrt(2) - 0.05 * barrierCirclesCount - 0.01 * genom.Chromosome.Count, 0.0001);
         }
 

@@ -16,11 +16,11 @@ namespace GeneticAlgo.Core.GeneticOperators
             _randomizer = randomizer;
         }
 
-        public Genom Apply(Genom oldGenom)
+        public void Apply(Genom oldGenom)
         {
-            int position = _randomizer.NextCutPlace(oldGenom.Chromosome.Count);
+            int position = _randomizer.NextCutPlace(oldGenom.ChromosomeLength);
             oldGenom.Chromosome[position] = new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart());
-            return oldGenom;
+            // return oldGenom;
         }
     }
 }

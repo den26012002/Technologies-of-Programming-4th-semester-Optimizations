@@ -16,10 +16,20 @@ namespace GeneticAlgo.Core.GeneticOperators
             _randomizer = randomizer;
         }
 
-        public Genom Apply(Genom oldGenom)
+        public void Apply(Genom oldGenom)
         {
-            oldGenom.Chromosome.Add(new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart()));
-            return oldGenom;
+            VectorGen[] newChromosome = CountedArrayPoolDecorator<VectorGen>.Rent(oldGenom.ChromosomeLength + 1);
+            for (int i = 0; i < oldGenom.ChromosomeLength; ++i)
+            {
+                newChromosome[i] = oldGenom.Chromosome[i].Clone();
+            }
+            newChromosome[oldGenom.ChromosomeLength] = new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart());
+
+            CountedArrayPoolDecorator<VectorGen>.Return(oldGenom.Chromosome);
+            oldGenom.Chromosome = newChromosome;
+            oldGenom.ChromosomeLength = oldGenom.ChromosomeLength + 1;
+
+            // return oldGenom;
         }
     }
 }

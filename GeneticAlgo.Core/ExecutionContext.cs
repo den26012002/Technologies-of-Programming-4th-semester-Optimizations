@@ -54,8 +54,8 @@ namespace GeneticAlgo.Core
             _populationPoints = new Point[_config.UnitCount];
             for (int i = 0; i < _config.UnitCount; ++i)
             {
-                var genom = new Genom();
-                genom.Chromosome.Add(new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart()));
+                var genom = new Genom(1);
+                genom.Chromosome[0] = new VectorGen(_randomizer.NextGenPart(), _randomizer.NextGenPart());
                 Point resultPoint = new Point();
                 genom.FitnessValue = _fitnessFunctionCalculator.Calculate(genom, out resultPoint);
                 _populationPoints[i] = resultPoint;
@@ -65,39 +65,43 @@ namespace GeneticAlgo.Core
 
         public Task<IterationResult> ExecuteIterationAsync()
         {
-            bool[] wasMutation = new bool[_population.Length];
-            var newPopulation = _selectionOperator.Apply(_population);
-            for (int i = 0; i < newPopulation.Length / 3; ++i)
+            bool[] wasMutation = new bool[this._population.Length];
+            _selectionOperator.Apply(_population);
+            for (int i = 0; i < _population.Length / 3; ++i)
             {
                 wasMutation[i] = true;
             }
 
-            for (int i = 0; i < newPopulation.Length; ++i)
+            for (int i = 0; i < _population.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(1);
                 if (spinResult <= _config.FirstTypeMutationProbability && !wasMutation[i])
                 {
-                    var unit = newPopulation[i];
-                    newPopulation[i] = _firstTypeMutationOperator.Apply(unit);
-                    Point resultPoint = new Point();
-                    newPopulation[i].FitnessValue = _fitnessFunctionCalculator.Calculate(newPopulation[i], out resultPoint);
+                    int sizeBefore = _population[i].ChromosomeLength;
+                    _firstTypeMutationOperator.Apply(_population[i]);
+                    int sizeAfter = _population[i].ChromosomeLength;
+                    if (sizeBefore + 1 != sizeAfter)
+                    {
+                        Console.WriteLine("Warning: chromosome lenght wasn't increased");
+                    }
+                    /* Point resultPoint = new Point();
+                     _population[i].FitnessValue = _fitnessFunctionCalculator.Calculate(_population[i], out resultPoint);*/
                     wasMutation[i] = true;
                 }
             }
 
-            for (int i = 0; i < newPopulation.Length; ++i)
+            for (int i = 0; i < _population.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(1);
                 if (spinResult <= _config.SecondTypeMutationProbability && !wasMutation[i])
                 {
-                    var unit = newPopulation[i];
-                    newPopulation[i] = _secondTypeMutationOperator.Apply(unit);
+                    _secondTypeMutationOperator.Apply(_population[i]);
                     wasMutation[i] = true;
                 }
             }
 
             List<int> mergeUnitsPositions = new List<int>();
-            for (int i = 0; i < newPopulation.Length; ++i)
+            for (int i = 0; i < _population.Length; ++i)
             {
                 double spinResult = _randomizer.NextSpinResult(1);
                 if (spinResult <= _config.MergeProbability && !wasMutation[i])
@@ -111,18 +115,18 @@ namespace GeneticAlgo.Core
             {
                 int first = mergeUnitsPositions[i];
                 int second = mergeUnitsPositions[i + 1];
-                (newPopulation[first], newPopulation[second]) = _mergeOperator.Apply(newPopulation[first], newPopulation[second]);
+                _mergeOperator.Apply(_population[first], _population[second]);
             }
 
             _populationPoints = new Point[_config.UnitCount];
-            for (int i = 0; i < newPopulation.Length; ++i)
+            for (int i = 0; i < _population.Length; ++i)
             {
                 Point resultPoint = new Point();
-                newPopulation[i].FitnessValue = _fitnessFunctionCalculator.Calculate(newPopulation[i], out resultPoint);
+                _population[i].FitnessValue = _fitnessFunctionCalculator.Calculate(_population[i], out resultPoint);
                 _populationPoints[i] = resultPoint;
             }
 
-            _population = newPopulation;
+            // this._population = _population;
             return Task.FromResult(IterationResult.IterationFinished);
         }
 

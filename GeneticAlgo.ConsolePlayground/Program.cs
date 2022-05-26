@@ -37,9 +37,9 @@ static void Print(GeneticAlgo.Core.ExecutionContext executionContext, bool needF
     {
         if (needFullLogs)
         {
-            foreach (var gen in unit.Chromosome)
+            for (int i = 0; i < unit.ChromosomeLength; ++i)
             {
-                Console.Write($"-{{{string.Format("{0:f1}", gen.X)}, {string.Format("{0:f1}", gen.Y)}}}");
+                Console.Write($"-{{{string.Format("{0:f1}", unit.Chromosome[i].X)}, {string.Format("{0:f1}", unit.Chromosome[i].Y)}}}");
             }
 
             Console.WriteLine($" {string.Format("{0:f3}", unit.FitnessValue)}");
@@ -64,11 +64,13 @@ GeneticAlgo.Core.ExecutionContext executionContext = new GeneticAlgo.Core.Execut
 for (int i = 0; i < 100; i++)
 {
     executionContext.ExecuteIterationAsync();
-    //Print(executionContext, false);
+    // Console.WriteLine(i);
+    // Print(executionContext, false);
     //Console.Write($" {i}");
 }
 
-//Print(executionContext);
+// Print(executionContext);
+// CountedArrayPoolDecorator<VectorGen>.PrintSizes();
 
 /*var executionContext = new GeneticAlgo.Core.ExecutionContext(
     new Random(),
