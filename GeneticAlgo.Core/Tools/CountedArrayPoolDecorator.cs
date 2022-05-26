@@ -38,12 +38,12 @@ namespace GeneticAlgo.Core.Tools
             _pool.Return(array);
         }
 
-        public static void PrintSizes()
+        /*public static void PrintSizes()
         {
             foreach (int size in _sizes)
             {
                 Console.WriteLine($"Size: {size}");
             }
-        }
+        }*/
     }
 }
