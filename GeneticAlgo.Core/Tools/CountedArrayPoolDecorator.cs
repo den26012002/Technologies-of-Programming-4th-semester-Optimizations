@@ -11,7 +11,8 @@ namespace GeneticAlgo.Core.Tools
     {
         private static int _counter = 0;
         private static int _maxCounterValue = 1500;
-        private static ArrayPool<T> _pool = ArrayPool<T>.Create();
+        // private static ArrayPool<T> _pool = ArrayPool<T>.Create();
+        private static MyArrayPool<T> _pool = new MyArrayPool<T>(new int[]{ 11000, 5500, 5500, 2250, 2250 }, 10000);
         // private static HashSet<int> _sizes = new HashSet<int>();
 
         public static T[] Rent(int minimumLength)
