@@ -10,11 +10,16 @@ namespace GeneticAlgo.Core.GeneticOperators
     public class SelectionOperator : ISelectionOperator
     {
         private IRandomizer _randomizer;
+        private double _spinResult;
+        private Predicate<double> _predicate;
 
         public SelectionOperator(IRandomizer randomizer)
         {
             _randomizer = randomizer;
+            _spinResult = 0;
+            _predicate = IsBiggerThanSpinResult;
         }
+
         public void Apply(Genom[] oldPopulation)
         {
             double[] prefixSums = new double[oldPopulation.Length];
@@ -37,8 +42,9 @@ namespace GeneticAlgo.Core.GeneticOperators
 
             for (int i = oldPopulation.Length / 2; i < oldPopulation.Length; ++i)
             {
-                double spinResult = _randomizer.NextSpinResult(prefixSums.Last());
-                int spinnedGenom = Array.FindIndex(prefixSums, x => x > spinResult);
+                _spinResult = _randomizer.NextSpinResult(prefixSums.Last());
+                // int spinnedGenom = Array.FindIndex(prefixSums, x => x > spinResult);
+                int spinnedGenom = Array.FindIndex(prefixSums, _predicate);
                 newChromosomes[i] = oldPopulation[spinnedGenom].GetClonedChromosome();
                 newChromosomesLengths[i] = oldPopulation[spinnedGenom].ChromosomeLength;
             }
@@ -52,7 +58,6 @@ namespace GeneticAlgo.Core.GeneticOperators
 
             // return oldPopulation;
         }
-
         private Genom GetGenomWithMaxFitnessValue(Genom[] population)
         {
             Genom ans = population.First();
@@ -65,6 +70,11 @@ namespace GeneticAlgo.Core.GeneticOperators
             }
 
             return ans;
+        }
+
+        private bool IsBiggerThanSpinResult(double x)
+        {
+            return x > _spinResult;
         }
     }
 }
