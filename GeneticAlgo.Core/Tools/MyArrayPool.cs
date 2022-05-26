@@ -11,8 +11,7 @@ namespace GeneticAlgo.Core.Tools
         private Dictionary<int, List<T[]>> _pools;
         private Dictionary<int, List<bool>> _isUsed;
         private Dictionary<int, List<int>> _unusedTime;
-        private Dictionary<int, HashSet<int>> _freeIndexes;
-        // private Dictionary<int, int> _capacities;
+        private Dictionary<int, Queue<int>> _freeIndexes;
         private int _maxUnusedTime;
 
 
@@ -21,79 +20,18 @@ namespace GeneticAlgo.Core.Tools
             _pools = new Dictionary<int, List<T[]>>();
             _isUsed = new Dictionary<int, List<bool>>();
             _unusedTime = new Dictionary<int, List<int>>();
-            _freeIndexes =  new Dictionary<int, HashSet<int>>();
+            _freeIndexes =  new Dictionary<int, Queue<int>>();
             for (int i = 0; i < startCapacity.Length; ++i)
             {
                 int index = (int)Math.Pow(2, 4 + i);
                 _pools[index] = new List<T[]>(startCapacity[i]);
                 _isUsed[index] = new List<bool>(startCapacity[i]);
                 _unusedTime[index] = new List<int>(startCapacity[i]);
-                _freeIndexes[index] = new HashSet<int>();
-                /*for (int j = 0; j < startCapacity[i]; ++j)
-                {
-                    _freeIndexes[index].Add(j);
-                }*/
+                _freeIndexes[index] = new Queue<int>();
             }
 
             _maxUnusedTime = maxUnusedTime;
         }
-
-        /*public T[] Rent(int minimumLength)
-        {
-            minimumLength = GetCorrectLenght(minimumLength);
-            List<T[]> pool = _pools[minimumLength];
-            int rentedIndex = -1;
-            int rentedArrayLength = -1;
-            int firstNullIndex = -1;
-            foreach (var i in _freeIndexes[minimumLength])
-            {
-                if (pool[i] == null)
-                {
-                    firstNullIndex = i;
-                    continue;
-                }
-
-                if (_isUsed[minimumLength][i] || pool[i].Length < minimumLength)
-                {
-                    continue;
-                }
-
-                if (rentedArrayLength == -1 || pool[i].Length < rentedArrayLength)
-                {
-                    rentedIndex = i;
-                    rentedArrayLength = pool[i].Length;
-                }
-            }
-
-            if (rentedIndex == -1)
-            {
-                if (firstNullIndex == -1)
-                {
-                    pool.Add(new T[minimumLength]);
-                    _isUsed[minimumLength].Add(true);
-                    _unusedTime[minimumLength].Add(0);
-                    for (int i = _capacities[minimumLength] + 1; i < pool.Capacity; ++i)
-                    {
-                        _freeIndexes[minimumLength].Add(i);
-                    }
-                    _capacities[minimumLength] = pool.Capacity;
-
-                    rentedIndex = pool.Count - 1;
-                    rentedArrayLength = minimumLength;
-                }
-                else
-                {
-                    pool[firstNullIndex] = new T[minimumLength];
-                    rentedIndex = firstNullIndex;
-                    rentedArrayLength = minimumLength;
-                }
-            }
-
-            _isUsed[minimumLength][rentedIndex] = true;
-            _unusedTime[minimumLength][rentedIndex] = 0;
-            Update();
-            return pool[rentedIndex];
-        }*/
 
         public T[] Rent(int minimumLength)
         {
@@ -108,8 +46,7 @@ namespace GeneticAlgo.Core.Tools
             }
             else
             {
-                int index = _freeIndexes[minimumLength].First();
-                _freeIndexes[minimumLength].Remove(index);
+                int index = _freeIndexes[minimumLength].Dequeue();
                 _isUsed[minimumLength][index] = true;
                 _unusedTime[minimumLength][index] = 0;
                 // Update();
@@ -127,7 +64,7 @@ namespace GeneticAlgo.Core.Tools
                 {
                     _isUsed[array.Length][i] = false;
                     _unusedTime[array.Length][i] = 0;
-                    _freeIndexes[array.Length].Add(i);
+                    _freeIndexes[array.Length].Enqueue(i);
                     isInPool = true;
                 }
             }
