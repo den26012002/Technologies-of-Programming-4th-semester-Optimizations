@@ -2,6 +2,9 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using GeneticAlgo.Core;
+using GeneticAlgo.Core.GeneticOperatorsBuilders;
+using GeneticAlgo.Core.Tools;
 using GeneticAlgo.Shared;
 using GeneticAlgo.Shared.Models;
 using GeneticAlgo.Shared.Tools;
@@ -33,7 +36,14 @@ namespace GeneticAlgo.WpfInterface
 
             Logger.Init();
 
-            _executionContext = new DummyExecutionContext(100, 10, 3);
+            //_executionContext = new DummyExecutionContext(100, 10, 3);
+            _executionContext = new ExecutionContext(
+                                        new Random(),
+                                        new FitnessFunctionCalculatorBuilder(),
+                                        new SelectionOperatorBuilder(),
+                                        new FirstTypeMutationOperatorBuilder(),
+                                        new SecondTypeMutationOperatorBuilder(),
+                                        new MergeOperatorBuilder());
             _configuration = new ExecutionConfiguration(IterationInterval, 10, 0);
 
             InitPlots();
@@ -85,7 +95,7 @@ namespace GeneticAlgo.WpfInterface
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _isActive = true;
+            _isActive = !_isActive;
         }
 
         private void StartSimulation(object? sender, DoWorkEventArgs e)
